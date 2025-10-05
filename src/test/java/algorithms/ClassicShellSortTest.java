@@ -1,3 +1,5 @@
+package algorithms;
+
 import com.company.algorithms.ClassicShellSort;
 import com.company.metricsAndCsv.metrics.MetricsCollector;
 import org.junit.jupiter.api.Test;
