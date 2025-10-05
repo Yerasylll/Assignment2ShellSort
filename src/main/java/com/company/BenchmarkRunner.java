@@ -1,17 +1,70 @@
 package com.company;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import com.company.algorithms.ClassicShellSort;
+import com.company.algorithms.ShellSort;
+import com.company.metricsAndCsv.metrics.MetricsCollector;
+import com.company.metricsAndCsv.csvWriter.CsvWriter;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+import java.util.Arrays;
+import java.util.Random;
+
+public class BenchmarkRunner {
+
+    public static void main(String[] args) {
+
+        // just setup
+        int size = 10000;
+        int[] data = generateRandomArray(size);
+        CsvWriter writer = new CsvWriter("benchmark-results.csv");
+        writer.writeHeader();
+
+        MetricsCollector metrics = new MetricsCollector();
+
+        // Classic Shell Sort
+        int[] classic = Arrays.copyOf(data, data.length);
+        ClassicShellSort.sort(classic, metrics);
+        record(writer, "ClassicShellSort", size, metrics);
+
+        // Optimized Shell Sort (SHELL)
+        int[] shell = Arrays.copyOf(data, data.length);
+        metrics.reset();
+        ShellSort.sort(shell, metrics, ShellSort.GapSequence.valueOf("SHELL"));
+        record(writer, "ShellSort-SHELL", size, metrics);
+
+        // Optimized Shell Sort (KNUTH)
+        int[] knuth = Arrays.copyOf(data, data.length);
+        metrics.reset();
+        ShellSort.sort(knuth, metrics, ShellSort.GapSequence.valueOf("KNUTH"));
+        record(writer, "ShellSort-KNUTH", size, metrics);
+
+        // Optimized Shell Sort (SEDGEWICK)
+        int[] sedgewick = Arrays.copyOf(data, data.length);
+        metrics.reset();
+        ShellSort.sort(sedgewick, metrics, ShellSort.GapSequence.valueOf("SEDGEWICK"));
+        record(writer, "ShellSort-SEDGEWICK", size, metrics);
+
+        System.out.println("All results written to benchmark-results.csv");
+    }
+
+    private static void record(CsvWriter writer, String algo, int n, MetricsCollector metrics) {
+        String row = String.format(
+                "%s,random,%d,%d,%d,%d,%d,%.3f",
+                algo,
+                n,
+                1,
+                metrics.comparisons().getComparisons(),
+                metrics.swaps().getSwaps(),
+                metrics.accesses().getAccesses(),
+                metrics.time().getElapsedTime() // convert ms → ns
+        );
+        writer.appendRow(row);
+        System.out.printf("%s done: %.3f ms%n", algo, metrics.time().getElapsedTime());
+    }
+
+    private static int[] generateRandomArray(int n) {
+        int[] arr = new int[n];
+        Random rand = new Random();
+        for (int i = 0; i < n; i++) arr[i] = rand.nextInt(100000);
+        return arr;
     }
 }
