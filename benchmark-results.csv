@@ -1,0 +1,5 @@
+algorithm,inputType,n,trial,comparisons,swaps,accesses,timeNano
+ClassicShellSort,random,10000,1,264280,149402,653692,10.433
+ShellSort-SHELL,random,10000,1,264280,149402,653692,10.385
+ShellSort-KNUTH,random,10000,1,229406,158516,538408,1.272
+ShellSort-SEDGEWICK,random,10000,1,196626,108417,491417,1.027
