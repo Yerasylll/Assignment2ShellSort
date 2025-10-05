@@ -24,16 +24,16 @@ public class ShellSort {
         for (int g : gaps) {
             for (int i = g; i < n; i++) {
                 int temp = arr[i];
-                metrics.accesses().incAccesses(); // read arr[i]
+                metrics.accesses().incAccesses();
 
                 int j = i;
                 while (j >= g) {
                     metrics.comparisons().incComparisons();
-                    metrics.accesses().incAccesses(); // read arr[j-g]
+                    metrics.accesses().incAccesses();
 
                     if (arr[j - g] > temp) {
                         arr[j] = arr[j - g];
-                        metrics.accesses().incAccesses(); // write
+                        metrics.accesses().incAccesses();
                         metrics.swaps().incSwaps();
                         j -= g;
                     } else {
