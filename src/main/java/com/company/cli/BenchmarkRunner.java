@@ -1,4 +1,4 @@
-package com.company;
+package com.company.cli;
 
 import com.company.algorithms.ClassicShellSort;
 import com.company.algorithms.ShellSort;
