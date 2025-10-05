@@ -11,6 +11,6 @@ public class TimeMetric {
 
     public void reset() { elapsedTime = 0; }
 
-    public long getElapsedTime() { return elapsedTime / 1_000_000; } // ms
+    public double getElapsedTime() { return elapsedTime / 1_000_000.0; } // ms
 
 }
