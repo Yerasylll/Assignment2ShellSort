@@ -35,7 +35,6 @@ Each algorithm is instrumented with a **MetricsCollector** that records:
 The **BenchmarkRunner** is a minimal command-line utility that runs all algorithms on randomly generated data and writes results to a CSV file.
 
 ### Example Run
-
 ```bash
 # Run via IntelliJ or terminal
 java src/main/java/com/company/cli/BenchmarkRunner.java
