@@ -2,8 +2,8 @@ package com.company.cli;
 
 import com.company.algorithms.ClassicShellSort;
 import com.company.algorithms.ShellSort;
-import com.company.metricsAndCsv.metrics.MetricsCollector;
 import com.company.metricsAndCsv.csvWriter.CsvWriter;
+import com.company.metricsAndCsv.metrics.MetricsCollector;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -11,39 +11,37 @@ import java.util.Random;
 public class BenchmarkRunner {
 
     public static void main(String[] args) {
+        int[] sizes = {100, 1000, 10000, 100000};
+        String outputPath = "docs/performance-plots/benchmark-results.csv";
 
-        // just setup
-        int size = 10000;
-        int[] data = generateRandomArray(size);
-        CsvWriter writer = new CsvWriter("benchmark-results.csv");
+        CsvWriter writer = new CsvWriter(outputPath);
         writer.writeHeader();
 
         MetricsCollector metrics = new MetricsCollector();
 
-        // Classic Shell Sort
-        int[] classic = Arrays.copyOf(data, data.length);
-        ClassicShellSort.sort(classic, metrics);
-        record(writer, "ClassicShellSort", size, metrics);
+        for (int n : sizes) {
+            System.out.println("\n===============================");
+            System.out.println("Benchmarking array size: " + n);
+            System.out.println("===============================");
 
-        // Optimized Shell Sort (SHELL)
-        int[] shell = Arrays.copyOf(data, data.length);
-        metrics.reset();
-        ShellSort.sort(shell, metrics, ShellSort.GapSequence.valueOf("SHELL"));
-        record(writer, "ShellSort-SHELL", size, metrics);
+            int[] baseData = generateRandomArray(n);
 
-        // Optimized Shell Sort (KNUTH)
-        int[] knuth = Arrays.copyOf(data, data.length);
-        metrics.reset();
-        ShellSort.sort(knuth, metrics, ShellSort.GapSequence.valueOf("KNUTH"));
-        record(writer, "ShellSort-KNUTH", size, metrics);
+            // Classic Shell Sorts
+            int[] classic = Arrays.copyOf(baseData, baseData.length);
+            metrics.reset();
+            ClassicShellSort.sort(classic, metrics);
+            record(writer, "ClassicShellSort", n, metrics);
 
-        // Optimized Shell Sort (SEDGEWICK)
-        int[] sedgewick = Arrays.copyOf(data, data.length);
-        metrics.reset();
-        ShellSort.sort(sedgewick, metrics, ShellSort.GapSequence.valueOf("SEDGEWICK"));
-        record(writer, "ShellSort-SEDGEWICK", size, metrics);
+            // Optimized Shell Sorts
+            for (ShellSort.GapSequence seq : ShellSort.GapSequence.values()) {
+                int[] arrCopy = Arrays.copyOf(baseData, baseData.length);
+                metrics.reset();
+                ShellSort.sort(arrCopy, metrics, seq);
+                record(writer, "ShellSort-" + seq.name(), n, metrics);
+            }
+        }
 
-        System.out.println("All results written to benchmark-results.csv");
+        System.out.println("\n All results written to: " + outputPath);
     }
 
     private static void record(CsvWriter writer, String algo, int n, MetricsCollector metrics) {
@@ -55,16 +53,24 @@ public class BenchmarkRunner {
                 metrics.comparisons().getComparisons(),
                 metrics.swaps().getSwaps(),
                 metrics.accesses().getAccesses(),
-                metrics.time().getElapsedTime() // convert ms → ns
+                metrics.time().getElapsedTime()
         );
         writer.appendRow(row);
-        System.out.printf("%s done: %.3f ms%n", algo, metrics.time().getElapsedTime());
+        System.out.printf("%-20s | n=%-7d | time=%.3f ms | comps=%d | swaps=%d | accesses=%d%n",
+                algo,
+                n,
+                metrics.time().getElapsedTime(),
+                metrics.comparisons().getComparisons(),
+                metrics.swaps().getSwaps(),
+                metrics.accesses().getAccesses());
     }
 
     private static int[] generateRandomArray(int n) {
         int[] arr = new int[n];
         Random rand = new Random();
-        for (int i = 0; i < n; i++) arr[i] = rand.nextInt(100000);
+        for (int i = 0; i < n; i++) {
+            arr[i] = rand.nextInt(100_000);
+        }
         return arr;
     }
 }
