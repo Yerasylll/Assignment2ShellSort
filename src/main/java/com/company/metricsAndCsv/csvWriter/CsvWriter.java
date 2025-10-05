@@ -10,7 +10,7 @@ public class CsvWriter {
 
     public void writeHeader() {
         try (FileWriter writer = new FileWriter(filePath, false)) {
-            writer.write("algorithm,inputType,n,trial,comparisons,swaps,accesses,timeNano\n");
+            writer.write("algorithm,inputType,n,trial,comparisons,swaps,accesses,timeMS\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
